@@ -42,6 +42,15 @@ def index():
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
+
+    category_counts = df.iloc[:, 4:].sum()
+    category_names = df.columns[4:]
+
+    categories_per_message_count = df.iloc[:, 4:].sum(axis='columns')
+    categories_per_message_stats = [categories_per_message_count.max(),
+                                    categories_per_message_count.mean(),
+                                    categories_per_message_count.min()]
+    categories_per_message_stats_names = ['max', 'mean', 'min']
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
@@ -61,6 +70,42 @@ def index():
                 },
                 'xaxis': {
                     'title': "Genre"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=category_names,
+                    y=category_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Message Categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Category"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=categories_per_message_stats_names,
+                    y=categories_per_message_stats
+                )
+            ],
+
+            'layout': {
+                'title': 'Categories per Message',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Statistics"
                 }
             }
         }
