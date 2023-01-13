@@ -1,0 +1,6 @@
+# Packages to be installed
+pandas
+sqlalchemy
+pickle
+nltk
+sklearn
