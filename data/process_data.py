@@ -4,35 +4,68 @@ from sqlalchemy import create_engine
 
 
 def load_data(messages_filepath, categories_filepath):
+    """
+    Load messages and categories from CSV files.
+    Args:
+        messages_filepath: path to the file containing messages
+        categories_filepath: path to the file containing categories
+
+    Returns:
+        dataframe containing messages and categories
+    """
+    # load datasets
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
-    
+    # merge dataframes
     df = messages.merge(categories, on='id')
     
     return df
 
 
 def clean_data(df):
+    """
+    Apply cleaning techniques to a dataset.
+    Args:
+        df: dataframe containing messages and categories
+
+    Returns:
+        cleaned dataframe
+    """
+    # split categories into separate columns
     categories = df.categories.str.split(';', expand=True)
-    
+    # use first row of the resulting dataframe to extract column names
     row = categories.iloc[0, :]
     category_colnames = row.apply(lambda x: x[:-2])
+    # rename the categories columns
     categories.columns = category_colnames
+
+    # convert category values to ones and zeros
     for column in categories:
         # set each value to be the last character of the string
         categories[column] = categories[column].astype('str').str[-1]
         # convert column from string to numeric
         categories[column] = pd.to_numeric(categories[column])
+
+    # replace the old category column with the new categories dataframe
     df.drop(columns=['categories'], inplace=True)
     df = pd.concat([df, categories], axis=1, join='inner')
-    
+
+    # remove duplicates
     df.drop_duplicates(inplace=True)
     
     return df
 
 
 def save_data(df, database_filename):
+    """
+    Save dataset to a database.
+    Args:
+        df: dataframe
+        database_filename: database file name
+    """
+    # create engine
     engine = create_engine(f'sqlite:///{database_filename}')
+    # export dataframe
     df.to_sql('messages', engine, if_exists='replace', index=False)
 
 

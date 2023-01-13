@@ -20,6 +20,16 @@ nltk.download('wordnet')
 
 
 def load_data(database_filepath):
+    """
+    Load datasets from a database.
+    Args:
+        database_filepath: path to the database file
+
+    Returns:
+        X: messages
+        Y: categories for the messages in X
+        category_names: names of the categories
+    """
     engine = create_engine(f'sqlite:///{database_filepath}')
     df = pd.read_sql_table('messages', con=engine)
     
@@ -34,6 +44,14 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    """
+    Process message text into tokens.
+    Args:
+        text:
+
+    Returns:
+
+    """
     lemmatizer = WordNetLemmatizer()
     tokens = word_tokenize(text)
     
@@ -46,6 +64,11 @@ def tokenize(text):
 
 
 def build_model():
+    """
+    Build ML model using a pipeline and best parameters found by GridSearchCV.
+    Returns:
+        built model
+    """
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -65,6 +88,14 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    Make a prediction using cv model and asses it's accuracy.
+    Args:
+        model: cv model
+        X_test: test messages dataset
+        Y_test: categories for the messages in the X_test
+        category_names: list of the categories
+    """
     Y_pred = model.predict(X_test)
     
     for i in range(Y_test.shape[1]):
@@ -73,6 +104,12 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    """
+    Save assessed model to a pickle file.
+    Args:
+        model: cv model
+        model_filepath: path to the pickle file
+    """
     with open(model_filepath, 'wb') as f:
         pickle.dump(model, f)
 
