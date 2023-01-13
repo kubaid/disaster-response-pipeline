@@ -45,6 +45,8 @@ def clean_data(df):
         categories[column] = categories[column].astype('str').str[-1]
         # convert column from string to numeric
         categories[column] = pd.to_numeric(categories[column])
+        # if the numeric value is more than 1, replace it with 1
+        categories[categories[column] > 1] = 1
 
     # replace the old category column with the new categories dataframe
     df.drop(columns=['categories'], inplace=True)
